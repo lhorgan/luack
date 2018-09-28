@@ -80,7 +80,7 @@ typedef struct LG {
 
 static unsigned int makeseed (lua_State *L) {
   char buff[4 * sizeof(size_t)];
-  unsigned int h = 1;
+  unsigned int h = 1/*luai_makeseed()*/;
   int p = 0;
   addbuff(buff, p, L);  /* heap variable */
   addbuff(buff, p, &h);  /* local variable */
@@ -308,7 +308,7 @@ LUA_API lua_State *lua_newstate (lua_Alloc f, void *ud) {
   g->frealloc = f;
   g->ud = ud;
   g->mainthread = L;
-  g->seed = makeseed(L);
+  g->seed = 1;
   g->gcrunning = 0;  /* no GC while building state */
   g->GCestimate = 0;
   g->strt.size = g->strt.nuse = 0;
