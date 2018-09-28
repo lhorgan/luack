@@ -36,18 +36,6 @@
 #define LUAI_GCMUL	200 /* GC runs 'twice the speed' of memory allocation */
 #endif
 
-
-/*
-** a macro to help the creation of a unique random seed when a state is
-** created; the seed is used to randomize hashes.
-*/
-#if !defined(luai_makeseed)
-#include <time.h>
-#define luai_makeseed()		cast(unsigned int, time(NULL))
-#endif
-
-
-
 /*
 ** thread state + extra space
 */
@@ -68,28 +56,6 @@ typedef struct LG {
 
 
 #define fromstate(L)	(cast(LX *, cast(lu_byte *, (L)) - offsetof(LX, l)))
-
-
-/*
-** Compute an initial seed as random as possible. Rely on Address Space
-** Layout Randomization (if present) to increase randomness..
-*/
-#define addbuff(b,p,e) \
-  { size_t t = cast(size_t, e); \
-    memcpy(b + p, &t, sizeof(t)); p += sizeof(t); }
-
-static unsigned int makeseed (lua_State *L) {
-  char buff[4 * sizeof(size_t)];
-  unsigned int h = 1/*luai_makeseed()*/;
-  int p = 0;
-  addbuff(buff, p, L);  /* heap variable */
-  addbuff(buff, p, &h);  /* local variable */
-  addbuff(buff, p, luaO_nilobject);  /* global variable */
-  addbuff(buff, p, &lua_newstate);  /* public function */
-  lua_assert(p == sizeof(buff));
-  return luaS_hash(buff, p, h);
-}
-
 
 /*
 ** set GCdebt to a new value keeping the value (totalbytes + GCdebt)
@@ -308,7 +274,6 @@ LUA_API lua_State *lua_newstate (lua_Alloc f, void *ud) {
   g->frealloc = f;
   g->ud = ud;
   g->mainthread = L;
-  g->seed = 1;
   g->gcrunning = 0;  /* no GC while building state */
   g->GCestimate = 0;
   g->strt.size = g->strt.nuse = 0;

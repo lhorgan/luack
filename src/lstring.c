@@ -46,8 +46,8 @@ int luaS_eqlngstr (TString *a, TString *b) {
 }
 
 
-unsigned int luaS_hash (const char *str, size_t l, unsigned int seed) {
-  unsigned int h = seed ^ cast(unsigned int, l);
+unsigned int luaS_hash (const char *str, size_t l) {
+  unsigned int h = cast(unsigned int, l);
   size_t step = (l >> LUAI_HASHLIMIT) + 1;
   for (; l >= step; l -= step)
     h ^= ((h<<5) + (h>>2) + cast_byte(str[l - 1]));
@@ -58,7 +58,7 @@ unsigned int luaS_hash (const char *str, size_t l, unsigned int seed) {
 unsigned int luaS_hashlongstr (TString *ts) {
   lua_assert(ts->tt == LUA_TLNGSTR);
   if (ts->extra == 0) {  /* no hash? */
-    ts->hash = luaS_hash(getstr(ts), ts->u.lnglen, ts->hash);
+    ts->hash = luaS_hash(getstr(ts), ts->u.lnglen);
     ts->extra = 1;  /* now it has its hash */
   }
   return ts->hash;
@@ -167,7 +167,7 @@ void luaS_remove (lua_State *L, TString *ts) {
 static TString *internshrstr (lua_State *L, const char *str, size_t l) {
   TString *ts;
   global_State *g = G(L);
-  unsigned int h = luaS_hash(str, l, g->seed);
+  unsigned int h = luaS_hash(str, l);
   TString **list = &g->strt.hash[lmod(h, g->strt.size)];
   lua_assert(str != NULL);  /* otherwise 'memcmp'/'memcpy' are undefined */
   for (ts = *list; ts != NULL; ts = ts->u.hnext) {
