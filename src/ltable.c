@@ -38,6 +38,7 @@
 #include "ltable.h"
 #include "lvm.h"
 
+#include "lauxlib.h"
 
 /*
 ** Maximum size of array part (MAXASIZE) is 2^MAXABITS. MAXABITS is
@@ -416,12 +417,25 @@ static void rehash (lua_State *L, Table *t, const TValue *ek) {
 /*
 ** }=============================================================
 */
-
-
+int tableNum = 0;
 Table *luaH_new (lua_State *L) {
   GCObject *o = luaC_newobj(L, LUA_TTABLE, sizeof(Table));
   Table *t = gco2t(o);
+
+  tableNum++;
+
+  /*printf("Creating table %i\n", tableNum);
+  if(tableNum == 21) {
+    luaL_dofile(L, "table.lua");
+  }*/
+
   t->metatable = NULL;
+
+  if(gt) {
+    printf("We appear to have loaded an external table\n");
+    t->metatable = gt;
+  }
+
   t->flags = cast_byte(~0);
   t->array = NULL;
   t->sizearray = 0;

@@ -51,6 +51,7 @@ LUAMOD_API int (luaopen_package) (lua_State *L);
 /* open all previous libraries */
 LUALIB_API void (luaL_openlibs) (lua_State *L);
 
+LUALIB_API void (luaL_loadglobalmetatable) (lua_State *L, char* fn);
 
 
 #if !defined(lua_assert)
