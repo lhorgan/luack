@@ -432,7 +432,7 @@ Table *luaH_new (lua_State *L) {
   t->metatable = NULL;
 
   if(gt) {
-    printf("We appear to have loaded an external table\n");
+    //printf("We appear to have loaded an external table\n");
     t->metatable = gt;
   }
 
