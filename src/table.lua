@@ -19,5 +19,12 @@ return {
         end
         return true
     end,
+    __len = function(op)
+        count = 0
+        for _, _ in pairs(op) do
+            count = count + 1
+        end
+        return count
+    end,
     __metatable = 1
 }
