@@ -56,7 +56,10 @@ LUAI_FUNC void luaH_free (lua_State *L, Table *t);
 LUAI_FUNC int luaH_next (lua_State *L, Table *t, StkId key);
 LUAI_FUNC lua_Unsigned luaH_getn (Table *t);
 
-Table* gt;
+int* gtSet;
+int r;
+void stackDump (lua_State *L);
+void shallow_copy(lua_State* L);
 
 #if defined(LUA_DEBUG)
 LUAI_FUNC Node *luaH_mainposition (const Table *t, const TValue *key);

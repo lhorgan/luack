@@ -868,10 +868,22 @@ void luaV_execute (lua_State *L) {
         int b = GETARG_B(i);
         int c = GETARG_C(i);
         Table *t = luaH_new(L);
+        /*if(lua_istable(L, -1)) {
+          printf("It's a table, by golly!\n");
+        }*/
         sethvalue(L, ra, t);
         if (b != 0 || c != 0)
           luaH_resize(L, t, luaO_fb2int(b), luaO_fb2int(c));
         checkGC(L, ra + 1);
+
+        if(gtSet) {
+          printf("HOORAY\n");
+          lua_rawgeti(L, LUA_REGISTRYINDEX, r);
+          shallow_copy(L);
+          
+          lua_setmetatable(L, -1);
+        }
+
         vmbreak;
       }
       vmcase(OP_SELF) {

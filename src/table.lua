@@ -1,4 +1,4 @@
-return {
+--[[return {
     __eq = function(lhs, rhs)
         for key, val in pairs(lhs) do
             if rhs[key] == nil then
@@ -27,4 +27,8 @@ return {
         return count
     end,
     __metatable = 1
+}--]]
+
+return {
+    [0]=0, [1]=1, [2]=2, [3]=3
 }

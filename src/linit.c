@@ -36,6 +36,8 @@
 
 #include "ltable.h"
 
+#include "stdlib.h"
+
 /*
 ** these libs are loaded by lua.c and are readily available to any Lua
 ** program
@@ -72,6 +74,10 @@ LUALIB_API void luaL_loadglobalmetatable (lua_State *L, char* fn) {
   if(lua_istable(L, -1)) {
     printf("HOORAH, WE HAVE A TABLE\n");
     //void* table = lua_gettable(L, -1);
-    gt = lua_topointer(L, -1);
+    //gt = lua_topointer(L, -1);
+    gtSet = malloc(sizeof(int));
+    *gtSet = 1;
+    r = luaL_ref(L, LUA_REGISTRYINDEX); // pop the table off the stack
+    printf("grrr %i\n", r);
   }
 }
