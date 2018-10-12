@@ -879,10 +879,11 @@ void luaV_execute (lua_State *L) {
         if(gtSet) {
           printf("HOORAY\n");
           lua_rawgeti(L, LUA_REGISTRYINDEX, r);
+          
           shallow_copy(L);
           
-          lua_setmetatable(L, -1);
-        }
+          lua_setmetatable(L, 1);
+       }
 
         vmbreak;
       }

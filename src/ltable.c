@@ -472,7 +472,8 @@ void shallow_copy(lua_State* L) {
   /* table is in the stack at index 't' */
   lua_newtable(L);
   lua_pushnil(L);  /* first key */
-  while (lua_next(L, -2) != 0) {
+  while (lua_next(L, -3) != 0) {
+    stackDump(L);
     /* uses 'key' (at index -2) and 'value' (at index -1) */
     printf("%s - %s\n",
           lua_typename(L, lua_type(L, -2)),
@@ -482,7 +483,6 @@ void shallow_copy(lua_State* L) {
     lua_pushvalue(L, -2);
     lua_insert(L, -2);
     lua_settable(L, -4);
-
     //lua_pop(L, 1);
   }
 
@@ -584,7 +584,7 @@ TValue *luaH_newkey (lua_State *L, Table *t, const TValue *key) {
       /* whatever called 'newkey' takes care of TM cache */
       return luaH_set(L, t, key);  /* insert key into grown table */
     }
-    lua_assert(!isdummy(t));
+    lua_assert(!isdummy(t)); // assert that lua is working the way we intend, more or less.
     othern = mainposition(t, gkey(mp));
     if (othern != mp) {  /* is colliding node out of its main position? */
       /* yes; move colliding node into free position */
