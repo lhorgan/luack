@@ -1,4 +1,4 @@
---[[return {
+t = {
     __eq = function(lhs, rhs)
         for key, val in pairs(lhs) do
             if rhs[key] == nil then
@@ -26,9 +26,17 @@
         end
         return count
     end,
-    __metatable = 1
-}--]]
-
-return {
-    [0]=0, [1]=1, [2]=2, [3]=3
+    __index = function(t, k)
+        print(ind)
+    end,
+    inserting = false,
+    --__metatable = 1
 }
+
+t.__newindex = function(table, k, v)
+    print(t)
+    rawset(t, k, v)
+    rawset(table, k, v)
+end
+
+return t

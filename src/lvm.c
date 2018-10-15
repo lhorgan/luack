@@ -877,11 +877,8 @@ void luaV_execute (lua_State *L) {
         checkGC(L, ra + 1);
 
         if(gtSet) {
-          printf("HOORAY\n");
           lua_rawgeti(L, LUA_REGISTRYINDEX, r);
-          
           shallow_copy(L);
-          
           lua_setmetatable(L, 1);
        }
 

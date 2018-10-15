@@ -2,3 +2,4 @@
 src/lua
 src/luac
 *.a
+.vscode/*

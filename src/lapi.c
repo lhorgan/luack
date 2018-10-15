@@ -684,7 +684,6 @@ LUA_API int lua_rawgetp (lua_State *L, int idx, const void *p) {
 
 
 LUA_API void lua_createtable (lua_State *L, int narray, int nrec) {
-  //printf("Creating table\n");
   Table *t;
   lua_lock(L);
   t = luaH_new(L);
@@ -694,15 +693,6 @@ LUA_API void lua_createtable (lua_State *L, int narray, int nrec) {
     luaH_resize(L, t, narray, nrec);
   luaC_checkGC(L);
   lua_unlock(L);
-
-  /*if(gtSet) {
-    printf("HOORAY\n");
-    lua_rawgeti(L, LUA_REGISTRYINDEX, r);
-    lua_setmetatable(L, -2);
-  }*/
-  /*if(lua_istable(L, -1)) {
-    printf("It's a table, by golly!");
-  }*/
 }
 
 

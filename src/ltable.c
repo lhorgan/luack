@@ -419,91 +419,29 @@ static void rehash (lua_State *L, Table *t, const TValue *ek) {
 */
 int tableNum = 0;
 Table *luaH_new (lua_State *L) {
-  //printf("Creating table helper\n");
   GCObject *o = luaC_newobj(L, LUA_TTABLE, sizeof(Table));
   Table *t = gco2t(o);
-
   tableNum++;
-
-  /*printf("Creating table %i\n", tableNum);
-  if(tableNum == 21) {
-    luaL_dofile(L, "table.lua");
-  }*/
-
   t->metatable = NULL;
-
-  /*if(gtSet) {
-    printf("We appear to have loaded an external table %i\n", r);
-    lua_rawgeti(L, LUA_REGISTRYINDEX, r);
-    //t->metatable = (Table*)lua_topointer(L, -1);
-    lua_setmetatable(L, -1);
-    printf("IS IT A TABLE %i\n", lua_istable(L, -1));
-    printf("yay %p\n", lua_topointer(L, -1));
-  }*/
-
   t->flags = cast_byte(~0);
   t->array = NULL;
   t->sizearray = 0;
   setnodevector(L, t, 0);
-
-  /*if(gtSet) {
-    printf("HOORAY life\n");
-    //lua_rawgeti(L, LUA_REGISTRYINDEX, r);
-  }*/
 
   return t;
 }
 
 
 void shallow_copy(lua_State* L) {
-  /*printf("Making a shallow copy\n");
   lua_newtable(L);
-  printf("Made new table\n");
   lua_pushnil(L);
-  printf("Pushed nil\n");
-  while(lua_next(L, index) != 0) {
-    printf("looping\n");
-    lua_pushvalue(L, -2);
-    lua_insert(L, -2);
-    lua_settable(L, -4);
-  }
-  printf("Completed shallow copy\n");*/
-
-  /* table is in the stack at index 't' */
-  lua_newtable(L);
-  lua_pushnil(L);  /* first key */
   while (lua_next(L, -3) != 0) {
-    stackDump(L);
-    /* uses 'key' (at index -2) and 'value' (at index -1) */
-    printf("%s - %s\n",
-          lua_typename(L, lua_type(L, -2)),
-          lua_typename(L, lua_type(L, -1)));
-    /* removes 'value'; keeps 'key' for next iteration */
-    
     lua_pushvalue(L, -2);
     lua_insert(L, -2);
     lua_settable(L, -4);
-    //lua_pop(L, 1);
-  }
-
-  // lua_createtable(L, 0, 0);
-
-  // lua_pushstring(L, "name");
-  // lua_pushstring(L, "alice");
-  // lua_settable(L, -3);  /* 3rd element from the stack top */
-
-  // lua_pushstring(L, "date");
-  // lua_pushstring(L, "8/23/1996");
-  // lua_settable(L, -3);
-
-  // lua_pushstring(L, "ip");
-  // lua_pushstring(L, "192.168.4.2");
-  // lua_settable(L, -3);
-
-  // lua_pushstring(L, "custom");
-  // lua_pushstring(L, "some text");
-  // lua_settable(L, -3);                    
+  }               
 }
+
 
 void stackDump (lua_State *L) {
   int i;
@@ -533,6 +471,7 @@ void stackDump (lua_State *L) {
   }
   printf("\n");  /* end the listing */
 }
+
 
 void luaH_free (lua_State *L, Table *t) {
   if (!isdummy(t))
