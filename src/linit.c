@@ -68,10 +68,10 @@ LUALIB_API void luaL_openlibs (lua_State *L) {
 }
 
 LUALIB_API void luaL_loadglobalmetatable (lua_State *L, char* fn) {
-  luaL_dofile(L, fn);
+  /*luaL_dofile(L, fn);
   if(lua_istable(L, -1)) {
     printf("HOORAH, WE HAVE A TABLE\n");
     //void* table = lua_gettable(L, -1);
     gt = lua_topointer(L, -1);
-  }
+  }*/
 }

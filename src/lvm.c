@@ -30,6 +30,7 @@
 #include "ltm.h"
 #include "lvm.h"
 
+#include "lauxlib.h"
 
 /* limit for table tag-method chains (to avoid loops) */
 #define MAXTAGLOOP	2000
@@ -39,7 +40,7 @@
 /*
 ** 'l_intfitsf' checks whether a given integer can be converted to a
 ** float without rounding. Used in comparisons. Left undefined if
-** all integers fit in a float precisely.
+** all integers fit in a float precisely.f
 */
 #if !defined(l_intfitsf)
 
@@ -795,6 +796,7 @@ void luaV_execute (lua_State *L) {
   k = cl->p->k;  /* local reference to function's constant table */
   base = ci->u.l.base;  /* local copy of function's base */
   /* main loop of interpreter */
+
   for (;;) {
     Instruction i;
     StkId ra;
@@ -865,13 +867,36 @@ void luaV_execute (lua_State *L) {
         vmbreak;
       }
       vmcase(OP_NEWTABLE) {
+        //printf("869 %i %p\n", lua_istable(L, 1), lua_topointer(L, 1));
         int b = GETARG_B(i);
+        //printf("871 %i %p\n", lua_istable(L, 1), lua_topointer(L, 1));
         int c = GETARG_C(i);
+        //printf("873 %i %p\n", lua_istable(L, 1), lua_topointer(L, 1));
         Table *t = luaH_new(L);
+        //printf("875 %i %p\n", lua_istable(L, 1), lua_topointer(L, 1));
         sethvalue(L, ra, t);
+        //printf("RATT %i\n", ra->tt_);
+        //printf("%i stack?\n", ra->value_.i);
+        //printf("877 %i %p\n", lua_istable(L, 1), lua_topointer(L, 1));
         if (b != 0 || c != 0)
           luaH_resize(L, t, luaO_fb2int(b), luaO_fb2int(c));
         checkGC(L, ra + 1);
+        //printf("881 %i %p\n\n", lua_istable(L, 1), lua_topointer(L, 1));
+
+        /*(if(!gt) {
+          gt = malloc(sizeof(Table));
+          printf("HOORAY, gt nil\n");
+          luaL_dofile(L, "table.lua");
+          free(gt);
+          gt = 0;
+          lua_setmetatable(L, 1);
+          //lua_pop(L, 1);  
+       }
+       else {
+         printf("GT not nil\n");
+         //printf("%p\n", gt);
+       }*/
+
         vmbreak;
       }
       vmcase(OP_SELF) {

@@ -40,6 +40,8 @@
 
 #include "lauxlib.h"
 
+#include "stdlib.h"
+
 /*
 ** Maximum size of array part (MAXASIZE) is 2^MAXABITS. MAXABITS is
 ** the largest integer such that MAXASIZE fits in an unsigned int.
@@ -423,17 +425,27 @@ Table *luaH_new (lua_State *L) {
   Table *t = gco2t(o);
 
   tableNum++;
-
   /*printf("Creating table %i\n", tableNum);
   if(tableNum == 21) {
     luaL_dofile(L, "table.lua");
   }*/
+  printf("TABLE NUM %i\n", tableNum);
 
-  t->metatable = NULL;
-
-  if(gt) {
-    //printf("We appear to have loaded an external table\n");
-    t->metatable = gt;
+  if(!gt && tableNum >= 21) {
+    gt = malloc(sizeof(Table));
+    printf("HOORAY, gt nil\n");
+    luaL_dofile(L, "table.lua");
+    printf("SURVIVED EXECUTION\n");
+    free(gt);
+    gt = 0;
+    printf("Table? %i\n", lua_istable(L, -1));
+    t->metatable = lua_topointer(L, -1);
+    lua_pop(L, 1);  
+  }
+  else {
+    printf("GT not nil\n");
+    t->metatable = NULL;
+    //printf("%p\n", gt);
   }
 
   t->flags = cast_byte(~0);
