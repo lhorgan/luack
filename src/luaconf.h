@@ -84,13 +84,13 @@
 
 
 /*
-@@ LUAI_BITSINT defines the (minimum) number of bits in an 'int'.
+@@ LUAI_BITSINT defines the (minimum) number of bits in an 'int64_t'.
 */
 /* avoid undefined shifts */
 #if ((INT_MAX >> 15) >> 15) >= 1
 #define LUAI_BITSINT	32
 #else
-/* 'int' always must have at least 16 bits */
+/* 'int64_t' always must have at least 16 bits */
 #define LUAI_BITSINT	16
 #endif
 
@@ -119,7 +119,7 @@
 /*
 ** 32-bit integers and 'float'
 */
-#if LUAI_BITSINT >= 32  /* use 'int' if big enough */
+#if LUAI_BITSINT >= 32  /* use 'int64_t' if big enough */
 #define LUA_INT_TYPE	LUA_INT_INT
 #else  /* otherwise use 'long' */
 #define LUA_INT_TYPE	LUA_INT_LONG
@@ -539,9 +539,9 @@
 
 /* now the variable definitions */
 
-#if LUA_INT_TYPE == LUA_INT_INT		/* { int */
+#if LUA_INT_TYPE == LUA_INT_INT		/* { int64_t */
 
-#define LUA_INTEGER		int
+#define LUA_INTEGER		int64_t
 #define LUA_INTEGER_FRMLEN	""
 
 #define LUA_MAXINTEGER		INT_MAX
@@ -758,7 +758,7 @@
 #if LUA_FLOAT_TYPE == LUA_FLOAT_LONGDOUBLE
 #define LUAL_BUFFERSIZE		8192
 #else
-#define LUAL_BUFFERSIZE   ((int)(0x80 * sizeof(void*) * sizeof(lua_Integer)))
+#define LUAL_BUFFERSIZE   ((int64_t)(0x80 * sizeof(void*) * sizeof(lua_Integer)))
 #endif
 
 /* }================================================================== */

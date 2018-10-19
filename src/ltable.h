@@ -49,18 +49,18 @@ LUAI_FUNC const TValue *luaH_get (Table *t, const TValue *key);
 LUAI_FUNC TValue *luaH_newkey (lua_State *L, Table *t, const TValue *key);
 LUAI_FUNC TValue *luaH_set (lua_State *L, Table *t, const TValue *key);
 LUAI_FUNC Table *luaH_new (lua_State *L);
-LUAI_FUNC void luaH_resize (lua_State *L, Table *t, unsigned int nasize,
-                                                    unsigned int nhsize);
-LUAI_FUNC void luaH_resizearray (lua_State *L, Table *t, unsigned int nasize);
+LUAI_FUNC void luaH_resize (lua_State *L, Table *t, uint64_t nasize,
+                                                    uint64_t nhsize);
+LUAI_FUNC void luaH_resizearray (lua_State *L, Table *t, uint64_t nasize);
 LUAI_FUNC void luaH_free (lua_State *L, Table *t);
-LUAI_FUNC int luaH_next (lua_State *L, Table *t, StkId key);
+LUAI_FUNC int64_t luaH_next (lua_State *L, Table *t, StkId key);
 LUAI_FUNC lua_Unsigned luaH_getn (Table *t);
 
 Table* gt;
 
 #if defined(LUA_DEBUG)
 LUAI_FUNC Node *luaH_mainposition (const Table *t, const TValue *key);
-LUAI_FUNC int luaH_isdummy (const Table *t);
+LUAI_FUNC int64_t luaH_isdummy (const Table *t);
 #endif
 
 

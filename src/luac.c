@@ -22,15 +22,15 @@
 #include "lstate.h"
 #include "lundump.h"
 
-static void PrintFunction(const Proto* f, int full);
+static void PrintFunction(const Proto* f, int64_t full);
 #define luaU_print	PrintFunction
 
 #define PROGNAME	"luac"		/* default program name */
 #define OUTPUT		PROGNAME ".out"	/* default output file */
 
-static int listing=0;			/* list bytecodes? */
-static int dumping=1;			/* dump bytecodes? */
-static int stripping=0;			/* strip debug information? */
+static int64_t listing=0;			/* list bytecodes? */
+static int64_t dumping=1;			/* dump bytecodes? */
+static int64_t stripping=0;			/* strip debug information? */
 static char Output[]={ OUTPUT };	/* default output file name */
 static const char* output=Output;	/* actual output file name */
 static const char* progname=PROGNAME;	/* actual program name */
@@ -69,10 +69,10 @@ static void usage(const char* message)
 
 #define IS(s)	(strcmp(argv[i],s)==0)
 
-static int doargs(int argc, char* argv[])
+static int64_t doargs(int64_t argc, char* argv[])
 {
- int i;
- int version=0;
+ int64_t i;
+ int64_t version=0;
  if (argv[0]!=NULL && *argv[0]!=0) progname=argv[0];
  for (i=1; i<argc; i++)
  {
@@ -122,7 +122,7 @@ static int doargs(int argc, char* argv[])
 static const char* reader(lua_State *L, void *ud, size_t *size)
 {
  UNUSED(L);
- if ((*(int*)ud)--)
+ if ((*(int64_t*)ud)--)
  {
   *size=sizeof(FUNCTION)-1;
   return FUNCTION;
@@ -136,14 +136,14 @@ static const char* reader(lua_State *L, void *ud, size_t *size)
 
 #define toproto(L,i) getproto(L->top+(i))
 
-static const Proto* combine(lua_State* L, int n)
+static const Proto* combine(lua_State* L, int64_t n)
 {
  if (n==1)
   return toproto(L,-1);
  else
  {
   Proto* f;
-  int i=n;
+  int64_t i=n;
   if (lua_load(L,reader,&i,"=(" PROGNAME ")",NULL)!=LUA_OK) fatal(lua_tostring(L,-1));
   f=toproto(L,-1);
   for (i=0; i<n; i++)
@@ -156,18 +156,18 @@ static const Proto* combine(lua_State* L, int n)
  }
 }
 
-static int writer(lua_State* L, const void* p, size_t size, void* u)
+static int64_t writer(lua_State* L, const void* p, size_t size, void* u)
 {
  UNUSED(L);
  return (fwrite(p,size,1,(FILE*)u)!=1) && (size!=0);
 }
 
-static int pmain(lua_State* L)
+static int64_t pmain(lua_State* L)
 {
- int argc=(int)lua_tointeger(L,1);
+ int64_t argc=(int64_t)lua_tointeger(L,1);
  char** argv=(char**)lua_touserdata(L,2);
  const Proto* f;
- int i;
+ int64_t i;
  if (!lua_checkstack(L,argc)) fatal("too many input files");
  for (i=0; i<argc; i++)
  {
@@ -189,10 +189,10 @@ static int pmain(lua_State* L)
  return 0;
 }
 
-int main(int argc, char* argv[])
+int64_t main(int64_t argc, char* argv[])
 {
  lua_State* L;
- int i=doargs(argc,argv);
+ int64_t i=doargs(argc,argv);
  argc-=i; argv+=i;
  if (argc<=0) usage("no input files given");
  L=luaL_newstate();
@@ -230,7 +230,7 @@ static void PrintString(const TString* ts)
  printf("%c",'"');
  for (i=0; i<n; i++)
  {
-  int c=(int)(unsigned char)s[i];
+  int64_t c=(int64_t)(unsigned char)s[i];
   switch (c)
   {
    case '"':  printf("\\\""); break;
@@ -251,7 +251,7 @@ static void PrintString(const TString* ts)
  printf("%c",'"');
 }
 
-static void PrintConstant(const Proto* f, int i)
+static void PrintConstant(const Proto* f, int64_t i)
 {
  const TValue* o=&f->k[i];
  switch (ttype(o))
@@ -288,18 +288,18 @@ static void PrintConstant(const Proto* f, int i)
 static void PrintCode(const Proto* f)
 {
  const Instruction* code=f->code;
- int pc,n=f->sizecode;
+ int64_t pc,n=f->sizecode;
  for (pc=0; pc<n; pc++)
  {
   Instruction i=code[pc];
   OpCode o=GET_OPCODE(i);
-  int a=GETARG_A(i);
-  int b=GETARG_B(i);
-  int c=GETARG_C(i);
-  int ax=GETARG_Ax(i);
-  int bx=GETARG_Bx(i);
-  int sbx=GETARG_sBx(i);
-  int line=getfuncline(f,pc);
+  int64_t a=GETARG_A(i);
+  int64_t b=GETARG_B(i);
+  int64_t c=GETARG_C(i);
+  int64_t ax=GETARG_Ax(i);
+  int64_t bx=GETARG_Bx(i);
+  int64_t sbx=GETARG_sBx(i);
+  int64_t line=getfuncline(f,pc);
   printf("\t%d\t",pc+1);
   if (line>0) printf("[%d]\t",line); else printf("[-]\t");
   printf("%-9s\t",luaP_opnames[o]);
@@ -378,7 +378,7 @@ static void PrintCode(const Proto* f)
     printf("\t; %p",VOID(f->p[bx]));
     break;
    case OP_SETLIST:
-    if (c==0) printf("\t; %d",(int)code[++pc]); else printf("\t; %d",c);
+    if (c==0) printf("\t; %d",(int64_t)code[++pc]); else printf("\t; %d",c);
     break;
    case OP_EXTRAARG:
     printf("\t; "); PrintConstant(f,ax);
@@ -391,7 +391,7 @@ static void PrintCode(const Proto* f)
 }
 
 #define SS(x)	((x==1)?"":"s")
-#define S(x)	(int)(x),SS(x)
+#define S(x)	(int64_t)(x),SS(x)
 
 static void PrintHeader(const Proto* f)
 {
@@ -407,7 +407,7 @@ static void PrintHeader(const Proto* f)
 	f->linedefined,f->lastlinedefined,
 	S(f->sizecode),VOID(f));
  printf("%d%s param%s, %d slot%s, %d upvalue%s, ",
-	(int)(f->numparams),f->is_vararg?"+":"",SS(f->numparams),
+	(int64_t)(f->numparams),f->is_vararg?"+":"",SS(f->numparams),
 	S(f->maxstacksize),S(f->sizeupvalues));
  printf("%d local%s, %d constant%s, %d function%s\n",
 	S(f->sizelocvars),S(f->sizek),S(f->sizep));
@@ -415,7 +415,7 @@ static void PrintHeader(const Proto* f)
 
 static void PrintDebug(const Proto* f)
 {
- int i,n;
+ int64_t i,n;
  n=f->sizek;
  printf("constants (%d) for %p:\n",n,VOID(f));
  for (i=0; i<n; i++)
@@ -440,9 +440,9 @@ static void PrintDebug(const Proto* f)
  }
 }
 
-static void PrintFunction(const Proto* f, int full)
+static void PrintFunction(const Proto* f, int64_t full)
 {
- int i,n=f->sizep;
+ int64_t i,n=f->sizep;
  PrintHeader(f);
  PrintCode(f);
  if (full) PrintDebug(f);

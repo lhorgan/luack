@@ -20,7 +20,7 @@
 #include "lzio.h"
 
 
-int luaZ_fill (ZIO *z) {
+int64_t luaZ_fill (ZIO *z) {
   size_t size;
   lua_State *L = z->L;
   const char *buff;

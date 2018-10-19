@@ -22,7 +22,7 @@
 
 
 
-CClosure *luaF_newCclosure (lua_State *L, int n) {
+CClosure *luaF_newCclosure (lua_State *L, int64_t n) {
   GCObject *o = luaC_newobj(L, LUA_TCCL, sizeCclosure(n));
   CClosure *c = gco2ccl(o);
   c->nupvalues = cast_byte(n);
@@ -30,7 +30,7 @@ CClosure *luaF_newCclosure (lua_State *L, int n) {
 }
 
 
-LClosure *luaF_newLclosure (lua_State *L, int n) {
+LClosure *luaF_newLclosure (lua_State *L, int64_t n) {
   GCObject *o = luaC_newobj(L, LUA_TLCL, sizeLclosure(n));
   LClosure *c = gco2lcl(o);
   c->p = NULL;
@@ -43,7 +43,7 @@ LClosure *luaF_newLclosure (lua_State *L, int n) {
 ** fill a closure with new closed upvalues
 */
 void luaF_initupvals (lua_State *L, LClosure *cl) {
-  int i;
+  int64_t i;
   for (i = 0; i < cl->nupvalues; i++) {
     UpVal *uv = luaM_new(L, UpVal);
     uv->refcount = 1;
@@ -137,8 +137,8 @@ void luaF_freeproto (lua_State *L, Proto *f) {
 ** Look for n-th local variable at line 'line' in function 'func'.
 ** Returns NULL if not found.
 */
-const char *luaF_getlocalname (const Proto *f, int local_number, int pc) {
-  int i;
+const char *luaF_getlocalname (const Proto *f, int64_t local_number, int64_t pc) {
+  int64_t i;
   for (i = 0; i<f->sizelocvars && f->locvars[i].startpc <= pc; i++) {
     if (pc < f->locvars[i].endpc) {  /* is variable active? */
       local_number--;

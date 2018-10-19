@@ -100,14 +100,14 @@ struct GCObject {
 typedef union Value {
   GCObject *gc;    /* collectable objects */
   void *p;         /* light userdata */
-  int b;           /* booleans */
+  int64_t b;           /* booleans */
   lua_CFunction f; /* light C functions */
   lua_Integer i;   /* integer numbers */
   lua_Number n;    /* float numbers */
 } Value;
 
 
-#define TValuefields	Value value_; int tt_
+#define TValuefields	Value value_; int64_t tt_
 
 
 typedef struct lua_TValue {
@@ -304,7 +304,7 @@ typedef struct TString {
   CommonHeader;
   lu_byte extra;  /* reserved words for short strings; "has hash" for longs */
   lu_byte shrlen;  /* length for short strings */
-  unsigned int hash;
+  uint64_t hash;
   union {
     size_t lnglen;  /* length for long strings */
     struct TString *hnext;  /* linked list for hash table */
@@ -396,8 +396,8 @@ typedef struct Upvaldesc {
 */
 typedef struct LocVar {
   TString *varname;
-  int startpc;  /* first point where variable is active */
-  int endpc;    /* first point where variable is dead */
+  int64_t startpc;  /* first point where variable is active */
+  int64_t endpc;    /* first point where variable is dead */
 } LocVar;
 
 
@@ -409,18 +409,18 @@ typedef struct Proto {
   lu_byte numparams;  /* number of fixed parameters */
   lu_byte is_vararg;
   lu_byte maxstacksize;  /* number of registers needed by this function */
-  int sizeupvalues;  /* size of 'upvalues' */
-  int sizek;  /* size of 'k' */
-  int sizecode;
-  int sizelineinfo;
-  int sizep;  /* size of 'p' */
-  int sizelocvars;
-  int linedefined;  /* debug information  */
-  int lastlinedefined;  /* debug information  */
+  int64_t sizeupvalues;  /* size of 'upvalues' */
+  int64_t sizek;  /* size of 'k' */
+  int64_t sizecode;
+  int64_t sizelineinfo;
+  int64_t sizep;  /* size of 'p' */
+  int64_t sizelocvars;
+  int64_t linedefined;  /* debug information  */
+  int64_t lastlinedefined;  /* debug information  */
   TValue *k;  /* constants used by the function */
   Instruction *code;  /* opcodes */
   struct Proto **p;  /* functions defined inside the function */
-  int *lineinfo;  /* map from opcodes to source lines (debug information) */
+  int64_t *lineinfo;  /* map from opcodes to source lines (debug information) */
   LocVar *locvars;  /* information about local variables (debug information) */
   Upvaldesc *upvalues;  /* upvalue information */
   struct LClosure *cache;  /* last-created closure with this prototype */
@@ -475,7 +475,7 @@ typedef union Closure {
 typedef union TKey {
   struct {
     TValuefields;
-    int next;  /* for chaining (offset for next node) */
+    int64_t next;  /* for chaining (offset for next node) */
   } nk;
   TValue tvk;
 } TKey;
@@ -498,7 +498,7 @@ typedef struct Table {
   CommonHeader;
   lu_byte flags;  /* 1<<p means tagmethod(p) is not present */
   lu_byte lsizenode;  /* log2 of size of 'node' array */
-  unsigned int sizearray;  /* size of 'array' array */
+  uint64_t sizearray;  /* size of 'array' array */
   TValue *array;  /* array part */
   Node *node;
   Node *lastfree;  /* any free position is before this position */
@@ -512,7 +512,7 @@ typedef struct Table {
 ** 'module' operation for hashing (size is always a power of 2)
 */
 #define lmod(s,size) \
-	(check_exp((size&(size-1))==0, (cast(int, (s) & ((size)-1)))))
+	(check_exp((size&(size-1))==0, (cast(int64_t, (s) & ((size)-1)))))
 
 
 #define twoto(x)	(1<<(x))
@@ -530,14 +530,14 @@ LUAI_DDEC const TValue luaO_nilobject_;
 /* size of buffer for 'luaO_utf8esc' function */
 #define UTF8BUFFSZ	8
 
-LUAI_FUNC int luaO_int2fb (unsigned int x);
-LUAI_FUNC int luaO_fb2int (int x);
-LUAI_FUNC int luaO_utf8esc (char *buff, unsigned long x);
-LUAI_FUNC int luaO_ceillog2 (unsigned int x);
-LUAI_FUNC void luaO_arith (lua_State *L, int op, const TValue *p1,
+LUAI_FUNC int64_t luaO_int2fb (uint64_t x);
+LUAI_FUNC int64_t luaO_fb2int (int64_t x);
+LUAI_FUNC int64_t luaO_utf8esc (char *buff, unsigned long x);
+LUAI_FUNC int64_t luaO_ceillog2 (uint64_t x);
+LUAI_FUNC void luaO_arith (lua_State *L, int64_t op, const TValue *p1,
                            const TValue *p2, TValue *res);
 LUAI_FUNC size_t luaO_str2num (const char *s, TValue *o);
-LUAI_FUNC int luaO_hexavalue (int c);
+LUAI_FUNC int64_t luaO_hexavalue (int64_t c);
 LUAI_FUNC void luaO_tostring (lua_State *L, StkId obj);
 LUAI_FUNC const char *luaO_pushvfstring (lua_State *L, const char *fmt,
                                                        va_list argp);

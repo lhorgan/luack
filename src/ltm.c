@@ -44,7 +44,7 @@ void luaT_init (lua_State *L) {
     "__unm", "__bnot", "__lt", "__le",
     "__concat", "__call"
   };
-  int i;
+  int64_t i;
   for (i=0; i<TM_N; i++) {
     G(L)->tmname[i] = luaS_new(L, luaT_eventname[i]);
     luaC_fix(L, obj2gco(G(L)->tmname[i]));  /* never collect these names */
@@ -100,7 +100,7 @@ const char *luaT_objtypename (lua_State *L, const TValue *o) {
 
 
 void luaT_callTM (lua_State *L, const TValue *f, const TValue *p1,
-                  const TValue *p2, TValue *p3, int hasres) {
+                  const TValue *p2, TValue *p3, int64_t hasres) {
   ptrdiff_t result = savestack(L, p3);
   StkId func = L->top;
   setobj2s(L, func, f);  /* push function (assume EXTRA_STACK) */
@@ -121,7 +121,7 @@ void luaT_callTM (lua_State *L, const TValue *f, const TValue *p1,
 }
 
 
-int luaT_callbinTM (lua_State *L, const TValue *p1, const TValue *p2,
+int64_t luaT_callbinTM (lua_State *L, const TValue *p1, const TValue *p2,
                     StkId res, TMS event) {
   const TValue *tm = luaT_gettmbyobj(L, p1, event);  /* try first operand */
   if (ttisnil(tm))
@@ -155,7 +155,7 @@ void luaT_trybinTM (lua_State *L, const TValue *p1, const TValue *p2,
 }
 
 
-int luaT_callorderTM (lua_State *L, const TValue *p1, const TValue *p2,
+int64_t luaT_callorderTM (lua_State *L, const TValue *p1, const TValue *p2,
                       TMS event) {
   if (!luaT_callbinTM(L, p1, p2, L->top, event))
     return -1;  /* no metamethod */

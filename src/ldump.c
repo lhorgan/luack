@@ -23,8 +23,8 @@ typedef struct {
   lua_State *L;
   lua_Writer writer;
   void *data;
-  int strip;
-  int status;
+  int64_t strip;
+  int64_t status;
 } DumpState;
 
 
@@ -49,13 +49,13 @@ static void DumpBlock (const void *b, size_t size, DumpState *D) {
 #define DumpVar(x,D)		DumpVector(&x,1,D)
 
 
-static void DumpByte (int y, DumpState *D) {
+static void DumpByte (int64_t y, DumpState *D) {
   lu_byte x = (lu_byte)y;
   DumpVar(x, D);
 }
 
 
-static void DumpInt (int x, DumpState *D) {
+static void DumpInt (int64_t x, DumpState *D) {
   DumpVar(x, D);
 }
 
@@ -96,8 +96,8 @@ static void DumpCode (const Proto *f, DumpState *D) {
 static void DumpFunction(const Proto *f, TString *psource, DumpState *D);
 
 static void DumpConstants (const Proto *f, DumpState *D) {
-  int i;
-  int n = f->sizek;
+  int64_t i;
+  int64_t n = f->sizek;
   DumpInt(n, D);
   for (i = 0; i < n; i++) {
     const TValue *o = &f->k[i];
@@ -126,8 +126,8 @@ static void DumpConstants (const Proto *f, DumpState *D) {
 
 
 static void DumpProtos (const Proto *f, DumpState *D) {
-  int i;
-  int n = f->sizep;
+  int64_t i;
+  int64_t n = f->sizep;
   DumpInt(n, D);
   for (i = 0; i < n; i++)
     DumpFunction(f->p[i], f->source, D);
@@ -135,7 +135,7 @@ static void DumpProtos (const Proto *f, DumpState *D) {
 
 
 static void DumpUpvalues (const Proto *f, DumpState *D) {
-  int i, n = f->sizeupvalues;
+  int64_t i, n = f->sizeupvalues;
   DumpInt(n, D);
   for (i = 0; i < n; i++) {
     DumpByte(f->upvalues[i].instack, D);
@@ -145,7 +145,7 @@ static void DumpUpvalues (const Proto *f, DumpState *D) {
 
 
 static void DumpDebug (const Proto *f, DumpState *D) {
-  int i, n;
+  int64_t i, n;
   n = (D->strip) ? 0 : f->sizelineinfo;
   DumpInt(n, D);
   DumpVector(f->lineinfo, n, D);
@@ -186,7 +186,7 @@ static void DumpHeader (DumpState *D) {
   DumpByte(LUAC_VERSION, D);
   DumpByte(LUAC_FORMAT, D);
   DumpLiteral(LUAC_DATA, D);
-  DumpByte(sizeof(int), D);
+  DumpByte(sizeof(int64_t), D);
   DumpByte(sizeof(size_t), D);
   DumpByte(sizeof(Instruction), D);
   DumpByte(sizeof(lua_Integer), D);
@@ -199,8 +199,8 @@ static void DumpHeader (DumpState *D) {
 /*
 ** dump Lua function as precompiled chunk
 */
-int luaU_dump(lua_State *L, const Proto *f, lua_Writer w, void *data,
-              int strip) {
+int64_t luaU_dump(lua_State *L, const Proto *f, lua_Writer w, void *data,
+              int64_t strip) {
   DumpState D;
   D.L = L;
   D.writer = w;

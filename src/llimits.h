@@ -48,7 +48,7 @@ typedef unsigned char lu_byte;
 #define MAX_LMEM	((l_mem)(MAX_LUMEM >> 1))
 
 
-#define MAX_INT		INT_MAX  /* maximum value of an int */
+#define MAX_INT		INT_MAX  /* maximum value of an int64_t */
 
 
 /*
@@ -56,7 +56,7 @@ typedef unsigned char lu_byte;
 ** this is for hashing only; there is no problem if the integer
 ** cannot hold the whole pointer value
 */
-#define point2uint(p)	((unsigned int)((size_t)(p) & UINT_MAX))
+#define point2uint(p)	((uint64_t)((size_t)(p) & UINT_MAX))
 
 
 
@@ -113,7 +113,7 @@ typedef LUAI_UACINT l_uacInt;
 #define cast_void(i)	cast(void, (i))
 #define cast_byte(i)	cast(lu_byte, (i))
 #define cast_num(i)	cast(lua_Number, (i))
-#define cast_int(i)	cast(int, (i))
+#define cast_int(i)	cast(int64_t, (i))
 #define cast_uchar(i)	cast(unsigned char, (i))
 
 
@@ -147,7 +147,7 @@ typedef LUAI_UACINT l_uacInt;
 
 /*
 ** maximum depth for nested C calls and syntactical nested non-terminals
-** in a program. (Value must fit in an unsigned short int.)
+** in a program. (Value must fit in an unsigned short int64_t.)
 */
 #if !defined(LUAI_MAXCCALLS)
 #define LUAI_MAXCCALLS		200
@@ -160,7 +160,7 @@ typedef LUAI_UACINT l_uacInt;
 ** must be an unsigned with (at least) 4 bytes (see details in lopcodes.h)
 */
 #if LUAI_BITSINT >= 32
-typedef unsigned int Instruction;
+typedef uint64_t Instruction;
 #else
 typedef unsigned long Instruction;
 #endif
@@ -310,7 +310,7 @@ typedef unsigned long Instruction;
 #else
 /* realloc stack keeping its size */
 #define condmovestack(L,pre,pos)  \
-	{ int sz_ = (L)->stacksize; pre; luaD_reallocstack((L), sz_); pos; }
+	{ int64_t sz_ = (L)->stacksize; pre; luaD_reallocstack((L), sz_); pos; }
 #endif
 
 #if !defined(HARDMEMTESTS)

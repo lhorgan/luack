@@ -66,7 +66,7 @@
 #define l_timet			lua_Integer
 #define l_pushtime(L,t)		lua_pushinteger(L,(lua_Integer)(t))
 
-static time_t l_checktime (lua_State *L, int arg) {
+static time_t l_checktime (lua_State *L, int64_t arg) {
   lua_Integer t = luaL_checkinteger(L, arg);
   luaL_argcheck(L, (time_t)t == t, arg, "time out-of-bounds");
   return (time_t)t;
@@ -138,9 +138,9 @@ static time_t l_checktime (lua_State *L, int arg) {
 
 
 
-static int os_execute (lua_State *L) {
+static int64_t os_execute (lua_State *L) {
   const char *cmd = luaL_optstring(L, 1, NULL);
-  int stat = system(cmd);
+  int64_t stat = system(cmd);
   if (cmd != NULL)
     return luaL_execresult(L, stat);
   else {
@@ -150,22 +150,22 @@ static int os_execute (lua_State *L) {
 }
 
 
-static int os_remove (lua_State *L) {
+static int64_t os_remove (lua_State *L) {
   const char *filename = luaL_checkstring(L, 1);
   return luaL_fileresult(L, remove(filename) == 0, filename);
 }
 
 
-static int os_rename (lua_State *L) {
+static int64_t os_rename (lua_State *L) {
   const char *fromname = luaL_checkstring(L, 1);
   const char *toname = luaL_checkstring(L, 2);
   return luaL_fileresult(L, rename(fromname, toname) == 0, NULL);
 }
 
 
-static int os_tmpname (lua_State *L) {
+static int64_t os_tmpname (lua_State *L) {
   char buff[LUA_TMPNAMBUFSIZE];
-  int err;
+  int64_t err;
   lua_tmpnam(buff, err);
   if (err)
     return luaL_error(L, "unable to generate a unique filename");
@@ -174,13 +174,13 @@ static int os_tmpname (lua_State *L) {
 }
 
 
-static int os_getenv (lua_State *L) {
+static int64_t os_getenv (lua_State *L) {
   lua_pushstring(L, getenv(luaL_checkstring(L, 1)));  /* if NULL push nil */
   return 1;
 }
 
 
-static int os_clock (lua_State *L) {
+static int64_t os_clock (lua_State *L) {
   lua_pushnumber(L, ((lua_Number)clock())/(lua_Number)CLOCKS_PER_SEC);
   return 1;
 }
@@ -194,12 +194,12 @@ static int os_clock (lua_State *L) {
 ** =======================================================
 */
 
-static void setfield (lua_State *L, const char *key, int value) {
+static void setfield (lua_State *L, const char *key, int64_t value) {
   lua_pushinteger(L, value);
   lua_setfield(L, -2, key);
 }
 
-static void setboolfield (lua_State *L, const char *key, int value) {
+static void setboolfield (lua_State *L, const char *key, int64_t value) {
   if (value < 0)  /* undefined? */
     return;  /* does not set field */
   lua_pushboolean(L, value);
@@ -223,22 +223,22 @@ static void setallfields (lua_State *L, struct tm *stm) {
 }
 
 
-static int getboolfield (lua_State *L, const char *key) {
-  int res;
+static int64_t getboolfield (lua_State *L, const char *key) {
+  int64_t res;
   res = (lua_getfield(L, -1, key) == LUA_TNIL) ? -1 : lua_toboolean(L, -1);
   lua_pop(L, 1);
   return res;
 }
 
 
-/* maximum value for date fields (to avoid arithmetic overflows with 'int') */
+/* maximum value for date fields (to avoid arithmetic overflows with 'int64_t') */
 #if !defined(L_MAXDATEFIELD)
 #define L_MAXDATEFIELD	(INT_MAX / 2)
 #endif
 
-static int getfield (lua_State *L, const char *key, int d, int delta) {
-  int isnum;
-  int t = lua_getfield(L, -1, key);  /* get field and its type */
+static int64_t getfield (lua_State *L, const char *key, int64_t d, int64_t delta) {
+  int64_t isnum;
+  int64_t t = lua_getfield(L, -1, key);  /* get field and its type */
   lua_Integer res = lua_tointegerx(L, -1, &isnum);
   if (!isnum) {  /* field is not an integer? */
     if (t != LUA_TNIL)  /* some other value? */
@@ -253,14 +253,14 @@ static int getfield (lua_State *L, const char *key, int d, int delta) {
     res -= delta;
   }
   lua_pop(L, 1);
-  return (int)res;
+  return (int64_t)res;
 }
 
 
 static const char *checkoption (lua_State *L, const char *conv,
                                 ptrdiff_t convlen, char *buff) {
   const char *option = LUA_STRFTIMEOPTIONS;
-  int oplen = 1;  /* length of options being checked */
+  int64_t oplen = 1;  /* length of options being checked */
   for (; *option != '\0' && oplen <= convlen; option += oplen) {
     if (*option == '|')  /* next block? */
       oplen++;  /* will check options with next length (+1) */
@@ -280,7 +280,7 @@ static const char *checkoption (lua_State *L, const char *conv,
 #define SIZETIMEFMT	250
 
 
-static int os_date (lua_State *L) {
+static int64_t os_date (lua_State *L) {
   size_t slen;
   const char *s = luaL_optlstring(L, 1, "%c", &slen);
   time_t t = luaL_opt(L, l_checktime, 2, time(NULL));
@@ -322,7 +322,7 @@ static int os_date (lua_State *L) {
 }
 
 
-static int os_time (lua_State *L) {
+static int64_t os_time (lua_State *L) {
   time_t t;
   if (lua_isnoneornil(L, 1))  /* called without args? */
     t = time(NULL);  /* get current time */
@@ -348,7 +348,7 @@ static int os_time (lua_State *L) {
 }
 
 
-static int os_difftime (lua_State *L) {
+static int64_t os_difftime (lua_State *L) {
   time_t t1 = l_checktime(L, 1);
   time_t t2 = l_checktime(L, 2);
   lua_pushnumber(L, (lua_Number)difftime(t1, t2));
@@ -358,24 +358,24 @@ static int os_difftime (lua_State *L) {
 /* }====================================================== */
 
 
-static int os_setlocale (lua_State *L) {
-  static const int cat[] = {LC_ALL, LC_COLLATE, LC_CTYPE, LC_MONETARY,
+static int64_t os_setlocale (lua_State *L) {
+  static const int64_t cat[] = {LC_ALL, LC_COLLATE, LC_CTYPE, LC_MONETARY,
                       LC_NUMERIC, LC_TIME};
   static const char *const catnames[] = {"all", "collate", "ctype", "monetary",
      "numeric", "time", NULL};
   const char *l = luaL_optstring(L, 1, NULL);
-  int op = luaL_checkoption(L, 2, "all", catnames);
+  int64_t op = luaL_checkoption(L, 2, "all", catnames);
   lua_pushstring(L, setlocale(cat[op], l));
   return 1;
 }
 
 
-static int os_exit (lua_State *L) {
-  int status;
+static int64_t os_exit (lua_State *L) {
+  int64_t status;
   if (lua_isboolean(L, 1))
     status = (lua_toboolean(L, 1) ? EXIT_SUCCESS : EXIT_FAILURE);
   else
-    status = (int)luaL_optinteger(L, 1, EXIT_SUCCESS);
+    status = (int64_t)luaL_optinteger(L, 1, EXIT_SUCCESS);
   if (lua_toboolean(L, 2))
     lua_close(L);
   if (L) exit(status);  /* 'if' to avoid warnings for unreachable 'return' */
@@ -402,7 +402,7 @@ static const luaL_Reg syslib[] = {
 
 
 
-LUAMOD_API int luaopen_os (lua_State *L) {
+LUAMOD_API int64_t luaopen_os (lua_State *L) {
   luaL_newlib(L, syslib);
   return 1;
 }

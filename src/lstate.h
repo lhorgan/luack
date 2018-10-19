@@ -75,8 +75,8 @@ struct lua_longjmp;  /* defined in ldo.c */
 
 typedef struct stringtable {
   TString **hash;
-  int nuse;  /* number of elements */
-  int size;
+  int64_t nuse;  /* number of elements */
+  int64_t size;
 } stringtable;
 
 
@@ -143,7 +143,7 @@ typedef struct global_State {
   lu_mem GCestimate;  /* an estimate of the non-garbage memory in use */
   stringtable strt;  /* hash table for strings */
   TValue l_registry;
-  unsigned int seed;  /* randomized seed for hashes */
+  uint64_t seed;  /* randomized seed for hashes */
   lu_byte currentwhite;
   lu_byte gcstate;  /* state of garbage collector */
   lu_byte gckind;  /* kind of GC running */
@@ -159,9 +159,9 @@ typedef struct global_State {
   GCObject *tobefnz;  /* list of userdata to be GC */
   GCObject *fixedgc;  /* list of objects not to be collected */
   struct lua_State *twups;  /* list of threads with open upvalues */
-  unsigned int gcfinnum;  /* number of finalizers to call in each GC step */
-  int gcpause;  /* size of pause between successive GCs */
-  int gcstepmul;  /* GC 'granularity' */
+  uint64_t gcfinnum;  /* number of finalizers to call in each GC step */
+  int64_t gcpause;  /* size of pause between successive GCs */
+  int64_t gcstepmul;  /* GC 'granularity' */
   lua_CFunction panic;  /* to be called in unprotected errors */
   struct lua_State *mainthread;
   const lua_Number *version;  /* pointer to version number */
@@ -192,9 +192,9 @@ struct lua_State {
   CallInfo base_ci;  /* CallInfo for first level (C calling Lua) */
   volatile lua_Hook hook;
   ptrdiff_t errfunc;  /* current error handling function (stack index) */
-  int stacksize;
-  int basehookcount;
-  int hookcount;
+  int64_t stacksize;
+  int64_t basehookcount;
+  int64_t hookcount;
   unsigned short nny;  /* number of non-yieldable calls in stack */
   unsigned short nCcalls;  /* number of nested C calls */
   l_signalT hookmask;

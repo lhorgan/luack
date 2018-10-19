@@ -56,15 +56,15 @@ typedef struct expdesc {
   union {
     lua_Integer ival;    /* for VKINT */
     lua_Number nval;  /* for VKFLT */
-    int info;  /* for generic use */
+    int64_t info;  /* for generic use */
     struct {  /* for indexed variables (VINDEXED) */
       short idx;  /* index (R/K) */
       lu_byte t;  /* table (register or upvalue) */
       lu_byte vt;  /* whether 't' is register (VLOCAL) or upvalue (VUPVAL) */
     } ind;
   } u;
-  int t;  /* patch list of 'exit when true' */
-  int f;  /* patch list of 'exit when false' */
+  int64_t t;  /* patch list of 'exit when true' */
+  int64_t f;  /* patch list of 'exit when false' */
 } expdesc;
 
 
@@ -77,8 +77,8 @@ typedef struct Vardesc {
 /* description of pending goto statements and label statements */
 typedef struct Labeldesc {
   TString *name;  /* label identifier */
-  int pc;  /* position in code */
-  int line;  /* line where it appeared */
+  int64_t pc;  /* position in code */
+  int64_t line;  /* line where it appeared */
   lu_byte nactvar;  /* local level where it appears in current block */
 } Labeldesc;
 
@@ -86,8 +86,8 @@ typedef struct Labeldesc {
 /* list of labels or gotos */
 typedef struct Labellist {
   Labeldesc *arr;  /* array */
-  int n;  /* number of entries in use */
-  int size;  /* array size */
+  int64_t n;  /* number of entries in use */
+  int64_t size;  /* array size */
 } Labellist;
 
 
@@ -95,8 +95,8 @@ typedef struct Labellist {
 typedef struct Dyndata {
   struct {  /* list of active local variables */
     Vardesc *arr;
-    int n;
-    int size;
+    int64_t n;
+    int64_t size;
   } actvar;
   Labellist gt;  /* list of pending gotos */
   Labellist label;   /* list of active labels */
@@ -113,12 +113,12 @@ typedef struct FuncState {
   struct FuncState *prev;  /* enclosing function */
   struct LexState *ls;  /* lexical state */
   struct BlockCnt *bl;  /* chain of current blocks */
-  int pc;  /* next position to code (equivalent to 'ncode') */
-  int lasttarget;   /* 'label' of last 'jump label' */
-  int jpc;  /* list of pending jumps to 'pc' */
-  int nk;  /* number of elements in 'k' */
-  int np;  /* number of elements in 'p' */
-  int firstlocal;  /* index of first local var (in Dyndata array) */
+  int64_t pc;  /* next position to code (equivalent to 'ncode') */
+  int64_t lasttarget;   /* 'label' of last 'jump label' */
+  int64_t jpc;  /* list of pending jumps to 'pc' */
+  int64_t nk;  /* number of elements in 'k' */
+  int64_t np;  /* number of elements in 'p' */
+  int64_t firstlocal;  /* index of first local var (in Dyndata array) */
   short nlocvars;  /* number of elements in 'f->locvars' */
   lu_byte nactvar;  /* number of active local variables */
   lu_byte nups;  /* number of upvalues */
@@ -127,7 +127,7 @@ typedef struct FuncState {
 
 
 LUAI_FUNC LClosure *luaY_parser (lua_State *L, ZIO *z, Mbuffer *buff,
-                                 Dyndata *dyd, const char *name, int firstchar);
+                                 Dyndata *dyd, const char *name, int64_t firstchar);
 
 
 #endif

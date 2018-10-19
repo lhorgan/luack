@@ -11,7 +11,7 @@
 #include "lstate.h"
 
 
-#define pcRel(pc, p)	(cast(int, (pc) - (p)->code) - 1)
+#define pcRel(pc, p)	(cast(int64_t, (pc) - (p)->code) - 1)
 
 #define getfuncline(f,pc)	(((f)->lineinfo) ? (f)->lineinfo[pc] : -1)
 
@@ -31,7 +31,7 @@ LUAI_FUNC l_noret luaG_ordererror (lua_State *L, const TValue *p1,
                                                  const TValue *p2);
 LUAI_FUNC l_noret luaG_runerror (lua_State *L, const char *fmt, ...);
 LUAI_FUNC const char *luaG_addinfo (lua_State *L, const char *msg,
-                                                  TString *src, int line);
+                                                  TString *src, int64_t line);
 LUAI_FUNC l_noret luaG_errormsg (lua_State *L);
 LUAI_FUNC void luaG_traceexec (lua_State *L);
 

@@ -4,6 +4,8 @@
 ** See Copyright Notice in lua.h
 */
 
+#include <stdint.h>
+
 #ifndef lapi_h
 #define lapi_h
 

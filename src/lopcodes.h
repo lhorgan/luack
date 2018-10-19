@@ -53,7 +53,7 @@ enum OpMode {iABC, iABx, iAsBx, iAx};  /* basic instruction format */
 
 /*
 ** limits for opcode arguments.
-** we use (signed) int to manipulate most arguments,
+** we use (signed) int64_t to manipulate most arguments,
 ** so they must fit in LUAI_BITSINT-1 bits (-1 for sign)
 */
 #if SIZE_Bx < LUAI_BITSINT-1
@@ -90,7 +90,7 @@ enum OpMode {iABC, iABx, iAsBx, iAx};  /* basic instruction format */
 #define SET_OPCODE(i,o)	((i) = (((i)&MASK0(SIZE_OP,POS_OP)) | \
 		((cast(Instruction, o)<<POS_OP)&MASK1(SIZE_OP,POS_OP))))
 
-#define getarg(i,pos,size)	(cast(int, ((i)>>pos) & MASK1(size,0)))
+#define getarg(i,pos,size)	(cast(int64_t, ((i)>>pos) & MASK1(size,0)))
 #define setarg(i,v,pos,size)	((i) = (((i)&MASK0(size,pos)) | \
                 ((cast(Instruction, v)<<pos)&MASK1(size,pos))))
 
@@ -110,7 +110,7 @@ enum OpMode {iABC, iABx, iAsBx, iAx};  /* basic instruction format */
 #define SETARG_Ax(i,v)	setarg(i, v, POS_Ax, SIZE_Ax)
 
 #define GETARG_sBx(i)	(GETARG_Bx(i)-MAXARG_sBx)
-#define SETARG_sBx(i,b)	SETARG_Bx((i),cast(unsigned int, (b)+MAXARG_sBx))
+#define SETARG_sBx(i,b)	SETARG_Bx((i),cast(uint64_t, (b)+MAXARG_sBx))
 
 
 #define CREATE_ABC(o,a,b,c)	((cast(Instruction, o)<<POS_OP) \
@@ -137,7 +137,7 @@ enum OpMode {iABC, iABx, iAsBx, iAx};  /* basic instruction format */
 #define ISK(x)		((x) & BITRK)
 
 /* gets the index of the constant */
-#define INDEXK(r)	((int)(r) & ~BITRK)
+#define INDEXK(r)	((int64_t)(r) & ~BITRK)
 
 #if !defined(MAXINDEXRK)  /* (for debugging only) */
 #define MAXINDEXRK	(BITRK - 1)
@@ -234,7 +234,7 @@ OP_EXTRAARG/*	Ax	extra (larger) argument for previous opcode	*/
 } OpCode;
 
 
-#define NUM_OPCODES	(cast(int, OP_EXTRAARG) + 1)
+#define NUM_OPCODES	(cast(int64_t, OP_EXTRAARG) + 1)
 
 
 

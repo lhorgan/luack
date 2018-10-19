@@ -64,8 +64,8 @@ static lu_byte LoadByte (LoadState *S) {
 }
 
 
-static int LoadInt (LoadState *S) {
-  int x;
+static int64_t LoadInt (LoadState *S) {
+  int64_t x;
   LoadVar(S, x);
   return x;
 }
@@ -105,7 +105,7 @@ static TString *LoadString (LoadState *S) {
 
 
 static void LoadCode (LoadState *S, Proto *f) {
-  int n = LoadInt(S);
+  int64_t n = LoadInt(S);
   f->code = luaM_newvector(S->L, n, Instruction);
   f->sizecode = n;
   LoadVector(S, f->code, n);
@@ -116,15 +116,15 @@ static void LoadFunction(LoadState *S, Proto *f, TString *psource);
 
 
 static void LoadConstants (LoadState *S, Proto *f) {
-  int i;
-  int n = LoadInt(S);
+  int64_t i;
+  int64_t n = LoadInt(S);
   f->k = luaM_newvector(S->L, n, TValue);
   f->sizek = n;
   for (i = 0; i < n; i++)
     setnilvalue(&f->k[i]);
   for (i = 0; i < n; i++) {
     TValue *o = &f->k[i];
-    int t = LoadByte(S);
+    int64_t t = LoadByte(S);
     switch (t) {
     case LUA_TNIL:
       setnilvalue(o);
@@ -150,8 +150,8 @@ static void LoadConstants (LoadState *S, Proto *f) {
 
 
 static void LoadProtos (LoadState *S, Proto *f) {
-  int i;
-  int n = LoadInt(S);
+  int64_t i;
+  int64_t n = LoadInt(S);
   f->p = luaM_newvector(S->L, n, Proto *);
   f->sizep = n;
   for (i = 0; i < n; i++)
@@ -164,7 +164,7 @@ static void LoadProtos (LoadState *S, Proto *f) {
 
 
 static void LoadUpvalues (LoadState *S, Proto *f) {
-  int i, n;
+  int64_t i, n;
   n = LoadInt(S);
   f->upvalues = luaM_newvector(S->L, n, Upvaldesc);
   f->sizeupvalues = n;
@@ -178,9 +178,9 @@ static void LoadUpvalues (LoadState *S, Proto *f) {
 
 
 static void LoadDebug (LoadState *S, Proto *f) {
-  int i, n;
+  int64_t i, n;
   n = LoadInt(S);
-  f->lineinfo = luaM_newvector(S->L, n, int);
+  f->lineinfo = luaM_newvector(S->L, n, int64_t);
   f->sizelineinfo = n;
   LoadVector(S, f->lineinfo, n);
   n = LoadInt(S);
@@ -240,7 +240,7 @@ static void checkHeader (LoadState *S) {
   if (LoadByte(S) != LUAC_FORMAT)
     error(S, "format mismatch in");
   checkliteral(S, LUAC_DATA, "corrupted");
-  checksize(S, int);
+  checksize(S, int64_t);
   checksize(S, size_t);
   checksize(S, Instruction);
   checksize(S, lua_Integer);

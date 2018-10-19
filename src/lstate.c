@@ -115,7 +115,7 @@ void luaE_shrinkCI (lua_State *L) {
 
 
 static void stack_init (lua_State *L1, lua_State *L) {
-  int i; CallInfo *ci;
+  int64_t i; CallInfo *ci;
   /* initialize stack array */
   L1->stack = luaM_newvector(L, BASIC_STACK_SIZE, TValue);
   L1->stacksize = BASIC_STACK_SIZE;
@@ -259,7 +259,7 @@ void luaE_freethread (lua_State *L, lua_State *L1) {
 
 
 LUA_API lua_State *lua_newstate (lua_Alloc f, void *ud) {
-  int i;
+  int64_t i;
   lua_State *L;
   global_State *g;
   LG *l = cast(LG *, (*f)(ud, NULL, LUA_TTHREAD, sizeof(LG)));

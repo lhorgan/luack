@@ -45,10 +45,10 @@
 #define MINSIZEARRAY	4
 
 
-void *luaM_growaux_ (lua_State *L, void *block, int *size, size_t size_elems,
-                     int limit, const char *what) {
+void *luaM_growaux_ (lua_State *L, void *block, int64_t *size, size_t size_elems,
+                     int64_t limit, const char *what) {
   void *newblock;
-  int newsize;
+  int64_t newsize;
   if (*size >= limit/2) {  /* cannot double it? */
     if (*size >= limit)  /* cannot grow even a little? */
       luaG_runerror(L, "too many %s (limit is %d)", what, limit);
