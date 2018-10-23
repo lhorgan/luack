@@ -22,6 +22,7 @@ t = {
     tables = {},
     tables_arr = {},
     tables_lens = {},
+    tables_arr_ind = {},
     __metatable = 1
 }
 
@@ -47,6 +48,10 @@ t.__newindex = function(tbl, key, value)
     if t.tables[tbl] == nil then
         t.tables[tbl] = {}
         t.tables_arr[tbl] = {}
+        --t.tables_arr_ind[tbl] = {stack={1}, len=1}
+        rawset(t.tables_arr_ind, tbl, {})
+        rawset(t.tables_arr_ind[tbl], "stack", {1})
+        rawset(t.tables_arr_ind[tbl], "len", 1)
         t.tables_lens[tbl] = 0
     end
 
@@ -59,7 +64,21 @@ t.__newindex = function(tbl, key, value)
         if rawget(t.tables[tbl], key) == nil then
             print("new key " .. tostring(key))
             rawset(t.tables_lens, tbl, rawget(t.tables_lens, tbl) + 1)
-            rawset(rawget(t.tables_arr, tbl), rawget(t.tables_lens, tbl), key)
+            
+            print("LENGTH " .. tostring(rawget(rawget(t.tables_arr_ind, tbl), "len")))
+            --pull empty index off the top of the stack
+            stack_len = rawget(rawget(t.tables_arr_ind, tbl), "len")
+            index_val = rawget(rawget(rawget(t.tables_arr_ind, tbl), "stack"), stack_len)
+
+            rawset(rawget(t.tables_arr, tbl), index_val, key)
+
+            rawset(rawget(rawget(t.tables_arr_ind, tbl), "stack"), stack_len, nil)
+            rawset(rawget(t.tables_arr_ind, tbl), "len", stack_len - 1)
+
+            if stack_len - 1 == 0 then
+                rawset(t.tables_arr_ind[tbl], "stack", {1})
+                rawset(t.tables_arr_ind[tbl], "len", 1)
+            end
         end
     end
 
