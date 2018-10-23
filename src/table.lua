@@ -27,17 +27,6 @@ t = {
 
 
 t.__len = function(tbl)
-    --[[count = 0
-
-    if t.tables[tbl] == nil then
-        t.tables[tbl] = {}
-    end
-    
-    for _, _ in pairs(t.tables[tbl]) do
-        count = count + 1
-    end
-    return count--]]
-
     curr_len = rawget(t.tables_lens, tbl)
     if curr_len == nil then
         rawset(t.tables_lens, tbl, 0)
@@ -79,19 +68,23 @@ end
 
 
 t.__pairs = function(tbl)
-    -- Iterator function
-    local function stateless_iter(tbl, k, i)
-        i = i + 1
-        print("grr " .. tostring(i))
-        print(t.tables_arr[tbl])
-        local key = rawget(rawget(t.tables_arr, tbl), i)
-        print("le key ..." .. tostring(key))
-        v = rawget(rawget(t.tables, tbl), key)
-        if v then return key, v end
+    i = 0
+    len = #tbl
+    num_found = 0
+    local function iter()
+        while num_found < len do
+            i = i + 1
+            local key = rawget(rawget(t.tables_arr, tbl), i)
+            --print("le key: " .. tostring(key))
+            v = rawget(rawget(t.tables, tbl), key)
+            if v then
+                num_found = num_found + 1
+                return key, v
+            end
+        end
     end
-  
-    -- return iterator function, table, and starting point
-    return stateless_iter, tbl, nil, 0
+
+    return iter
 end
 
 
