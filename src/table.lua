@@ -21,8 +21,10 @@ t = {
     end,
     tables = {},
     tables_arr = {},
+    tables_arr_rev = {},
     tables_lens = {},
     tables_arr_ind = {},
+    tables_arr_len = {},
     __metatable = 1
 }
 
@@ -48,6 +50,8 @@ t.__newindex = function(tbl, key, value)
     if t.tables[tbl] == nil then
         t.tables[tbl] = {}
         t.tables_arr[tbl] = {}
+        t.tables_arr_len[tbl] = 1
+        t.tables_arr_rev[tbl] = {}
         --t.tables_arr_ind[tbl] = {stack={1}, len=1}
         rawset(t.tables_arr_ind, tbl, {})
         rawset(t.tables_arr_ind[tbl], "stack", {1})
@@ -59,6 +63,16 @@ t.__newindex = function(tbl, key, value)
         if rawget(t.tables[tbl], key) ~= nil then
             print("removing key " .. tostring(key))
             rawset(t.tables_lens, tbl, rawget(t.tables_lens, tbl) - 1)
+            rawset(rawget(t.tables, tbl), key, nil)
+
+            table_arr_ind = rawget(rawget(t.tables_arr_rev, tbl), key)
+            
+            rawset(rawget(t.tables_arr, tbl), table_arr_ind, nil)
+            rawset(rawget(t.tables_arr_rev, tbl), key, nil)
+
+            stack_len = rawget(rawget(t.tables_arr_ind, tbl), "len")
+            rawset(rawget(t.tables_arr_ind, tbl), "len", stack_len + 1)
+            rawset(rawget(rawget(t.tables_arr_ind, tbl), "stack"), stack_len + 1, table_arr_ind)
         end
     else
         if rawget(t.tables[tbl], key) == nil then
@@ -71,12 +85,19 @@ t.__newindex = function(tbl, key, value)
             index_val = rawget(rawget(rawget(t.tables_arr_ind, tbl), "stack"), stack_len)
 
             rawset(rawget(t.tables_arr, tbl), index_val, key)
+            rawset(rawget(t.tables_arr_rev, tbl), key, index_val)
 
             rawset(rawget(rawget(t.tables_arr_ind, tbl), "stack"), stack_len, nil)
             rawset(rawget(t.tables_arr_ind, tbl), "len", stack_len - 1)
+            
+            tables_arr_size = rawget(t.tables_arr_len, tbl)
+            if index_val > tables_arr_size then
+                tables_arr_size = tables_arr_size + 1
+                rawset(t.tables_arr_len, tbl, tables_arr_size)
+            end
 
             if stack_len - 1 == 0 then
-                rawset(t.tables_arr_ind[tbl], "stack", {1})
+                rawset(t.tables_arr_ind[tbl], "stack", {tables_arr_size + 1})
                 rawset(t.tables_arr_ind[tbl], "len", 1)
             end
         end
@@ -90,15 +111,19 @@ t.__pairs = function(tbl)
     i = 0
     len = #tbl
     num_found = 0
+    grr = 0
     local function iter()
         while num_found < len do
             i = i + 1
+            print("i is " .. i)
             local key = rawget(rawget(t.tables_arr, tbl), i)
-            --print("le key: " .. tostring(key))
+            print("le key: " .. tostring(key))
             v = rawget(rawget(t.tables, tbl), key)
             if v then
                 num_found = num_found + 1
                 return key, v
+            else
+                print("nothing found at " .. tostring(i))
             end
         end
     end
