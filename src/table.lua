@@ -25,7 +25,7 @@ t = {
     tables_lens = {},
     tables_arr_ind = {},
     tables_arr_len = {},
-    __metatable = 1
+    --__metatable = 1
 }
 
 
@@ -111,7 +111,6 @@ t.__pairs = function(tbl)
     i = 0
     len = #tbl
     num_found = 0
-    grr = 0
     local function iter()
         while num_found < len do
             i = i + 1
@@ -120,6 +119,34 @@ t.__pairs = function(tbl)
             print("le key: " .. tostring(key))
             v = rawget(rawget(t.tables, tbl), key)
             if v then
+                num_found = num_found + 1
+                return key, v
+            else
+                print("nothing found at " .. tostring(i))
+            end
+        end
+    end
+
+    return iter
+end
+
+
+t.__ipairs = function(tbl)
+    i = 0
+    len = #tbl
+    num_found = 0
+    nonint_found = true
+    local function iter()
+        while num_found < len and nonint_found do
+            i = i + 1
+            print("i is " .. i)
+            local key = rawget(rawget(t.tables_arr, tbl), i)
+            print("le key: " .. tostring(key))
+            v = rawget(rawget(t.tables, tbl), key)
+            if not ((type(key) == "number" and math.floor(key) == key) and (type(v) == "number" and math.floor(v) == v)) then
+                nonint_found = false
+            end
+            if v and nonint_found then
                 num_found = num_found + 1
                 return key, v
             else

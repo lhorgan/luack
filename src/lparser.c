@@ -724,6 +724,7 @@ static void field (LexState *ls, struct ConsControl *cc) {
 static void constructor (LexState *ls, expdesc *t) {
   /* constructor -> '{' [ field { sep field } [sep] ] '}'
      sep -> ',' | ';' */
+  printf("in constructor func\n");
   FuncState *fs = ls->fs;
   int64_t line = ls->linenumber;
   int64_t pc = luaK_codeABC(fs, OP_NEWTABLE, 0, 0, 0);
@@ -736,6 +737,12 @@ static void constructor (LexState *ls, expdesc *t) {
   checknext(ls, '{');
   do {
     lua_assert(cc.v.k == VVOID || cc.tostore > 0);
+    if(gt && !(ls->t.token == '}' || ls->t.token == '[')) {
+      printf("GRRR ERRROR");
+      return;
+    }
+    //lua_assert(ls->t.token == '}' || ls->t.token == '[');
+    printf("TOKEN %c\n", ls->t.token);
     if (ls->t.token == '}') break;
     closelistfield(fs, &cc);
     field(ls, &cc);
@@ -831,6 +838,7 @@ static void funcargs (LexState *ls, expdesc *f, int64_t line) {
       break;
     }
     case '{': {  /* funcargs -> constructor */
+      printf("constructor 834!!!!\n");
       constructor(ls, &args);
       break;
     }
@@ -966,6 +974,7 @@ static void simpleexp (LexState *ls, expdesc *v) {
       break;
     }
     case '{': {  /* constructor */
+      printf("CONSTRUCTOR 970\n");
       constructor(ls, v);
       return;
     }
